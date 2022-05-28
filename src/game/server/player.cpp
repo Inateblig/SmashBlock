@@ -339,9 +339,17 @@ void CPlayer::Snap(int SnappingClient)
 	StrToInts(&pClientInfo->m_Clan0, 3, Server()->ClientClan(m_ClientID));
 	pClientInfo->m_Country = Server()->ClientCountry(m_ClientID);
 	StrToInts(&pClientInfo->m_Skin0, 6, m_TeeInfos.m_SkinName);
-	pClientInfo->m_UseCustomColor = m_TeeInfos.m_UseCustomColor;
-	pClientInfo->m_ColorBody = m_TeeInfos.m_ColorBody;
-	pClientInfo->m_ColorFeet = m_TeeInfos.m_ColorFeet;
+	pClientInfo->m_UseCustomColor = true;
+
+	int KnockbackStrength = m_pCharacter ? m_pCharacter->m_KnockbackStrength : 0;
+	SkinHue = std::min(64 + KnockbackStrength * 10, 255) << 16;
+	pClientInfo->m_ColorBody = SkinHue | 255 << 8;
+	pClientInfo->m_ColorFeet = SkinHue | 127 << 8;
+
+
+//	pClientInfo->m_UseCustomColor = m_TeeInfos.m_UseCustomColor;
+//	pClientInfo->m_ColorBody = m_TeeInfos.m_ColorBody;
+//	pClientInfo->m_ColorFeet = m_TeeInfos.m_ColorFeet;
 
 	int SnappingClientVersion = SnappingClient != SERVER_DEMO_CLIENT ? GameServer()->GetClientVersion(SnappingClient) : CLIENT_VERSIONNR;
 	int Latency = SnappingClient == SERVER_DEMO_CLIENT ? m_Latency.m_Min : GameServer()->m_apPlayers[SnappingClient]->m_aCurLatency[m_ClientID];

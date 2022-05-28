@@ -72,6 +72,8 @@ public:
 
 	bool m_IsReady;
 
+	int SkinHue;
+
 	//
 	int m_Vote;
 	int m_VotePos;

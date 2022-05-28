@@ -87,6 +87,9 @@ void CCharacterCore::Reset()
 	m_TriggeredEvents = 0;
 	m_Hook = true;
 	m_Collision = true;
+	m_ReleaseHook = 0;
+	m_Dash = 0;
+	m_DashTick = -1;
 
 	// DDNet Character
 	m_Solo = false;
@@ -150,6 +153,21 @@ void CCharacterCore::Tick(bool UseInput)
 		{
 			m_Angle = (int)(TmpAngle * 256.0f);
 		}
+
+		//do dash
+		if(m_Dash && m_DashTick < 0)
+		{
+			m_Vel = vec2(cos(TmpAngle),sin(TmpAngle)) * g_Config.m_SvDashImpulse;
+			m_Dash = 0;
+			m_DashTick = 0;
+		} else if(m_DashTick >= 0) {
+			m_DashTick++;
+			if(m_DashTick > g_Config.m_SvDashDelay / 1000.f * SERVER_TICK_SPEED)
+			{
+				m_DashTick = -1;
+			}
+		}
+
 
 		// Special jump cases:
 		// m_Jumps == -1: A tee may only make one ground jump. Second jumped bit is always set
@@ -378,11 +396,9 @@ void CCharacterCore::Tick(bool UseInput)
 
 		// release hook (max default hook time is 1.25 s)
 		m_HookTick++;
-		if(m_HookedPlayer != -1 && (m_HookTick > SERVER_TICK_SPEED + SERVER_TICK_SPEED / 5 || (m_pWorld && !m_pWorld->m_apCharacters[m_HookedPlayer])))
+		if(m_HookTick > SERVER_TICK_SPEED + SERVER_TICK_SPEED / 5 || (m_pWorld && !m_pWorld->m_apCharacters[m_HookedPlayer]))
 		{
-			SetHookedPlayer(-1);
-			m_HookState = HOOK_RETRACTED;
-			m_HookPos = m_Pos;
+			m_ReleaseHook = 1;
 		}
 	}
 

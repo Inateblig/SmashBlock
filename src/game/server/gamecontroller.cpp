@@ -23,7 +23,8 @@ IGameController::IGameController(class CGameContext *pGameServer)
 	m_pGameServer = pGameServer;
 	m_pConfig = m_pGameServer->Config();
 	m_pServer = m_pGameServer->Server();
-	m_pGameType = "unknown";
+//	m_pGameType = "unknown";
+	m_pGameType = "SmashBlock";
 
 	//
 	DoWarmup(g_Config.m_SvWarmup);
@@ -277,32 +278,33 @@ bool IGameController::OnEntity(int Index, vec2 Pos, int Layer, int Flags, int Nu
 
 	if(Index == ENTITY_ARMOR_1)
 		Type = POWERUP_ARMOR;
-	else if(Index == ENTITY_ARMOR_SHOTGUN)
-		Type = POWERUP_ARMOR_SHOTGUN;
-	else if(Index == ENTITY_ARMOR_GRENADE)
-		Type = POWERUP_ARMOR_GRENADE;
-	else if(Index == ENTITY_ARMOR_NINJA)
-		Type = POWERUP_ARMOR_NINJA;
-	else if(Index == ENTITY_ARMOR_LASER)
-		Type = POWERUP_ARMOR_LASER;
+//	else if(Index == ENTITY_ARMOR_SHOTGUN)
+//		Type = POWERUP_ARMOR_SHOTGUN;
+//	else if(Index == ENTITY_ARMOR_GRENADE)
+//		Type = POWERUP_ARMOR_GRENADE;
+//	else if(Index == ENTITY_ARMOR_NINJA)
+//		Type = POWERUP_ARMOR_NINJA;
+//	else if(Index == ENTITY_ARMOR_LASER)
+//		Type = POWERUP_ARMOR_LASER;
 	else if(Index == ENTITY_HEALTH_1)
 		Type = POWERUP_HEALTH;
-	else if(Index == ENTITY_WEAPON_SHOTGUN)
-	{
-		Type = POWERUP_WEAPON;
-		SubType = WEAPON_SHOTGUN;
-	}
-	else if(Index == ENTITY_WEAPON_GRENADE)
-	{
-		Type = POWERUP_WEAPON;
-		SubType = WEAPON_GRENADE;
-	}
-	else if(Index == ENTITY_WEAPON_LASER)
-	{
-		Type = POWERUP_WEAPON;
-		SubType = WEAPON_LASER;
-	}
-	else if(Index == ENTITY_POWERUP_NINJA)
+//	else if(Index == ENTITY_WEAPON_SHOTGUN)
+//	{
+//		Type = POWERUP_WEAPON;
+//		SubType = WEAPON_SHOTGUN;
+//	}
+//	else if(Index == ENTITY_WEAPON_GRENADE)
+//	{
+//		Type = POWERUP_WEAPON;
+//		SubType = WEAPON_GRENADE;
+//	}
+//	else if(Index == ENTITY_WEAPON_LASER)
+//	{
+//		Type = POWERUP_WEAPON;
+//		SubType = WEAPON_LASER;
+//	}
+	else if(Index == ENTITY_POWERUP_NINJA && g_Config.m_SvHammerSuper)
+//	else if(Index == ENTITY_POWERUP_NINJA)
 	{
 		Type = POWERUP_NINJA;
 		SubType = WEAPON_NINJA;
@@ -488,11 +490,11 @@ int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *
 void IGameController::OnCharacterSpawn(class CCharacter *pChr)
 {
 	// default health
-	pChr->IncreaseHealth(10);
+	pChr->IncreaseHealth(0);
 
 	// give default weapons
 	pChr->GiveWeapon(WEAPON_HAMMER);
-	pChr->GiveWeapon(WEAPON_GUN);
+//	pChr->GiveWeapon(WEAPON_GUN);
 }
 
 void IGameController::HandleCharacterTiles(CCharacter *pChr, int MapIndex)

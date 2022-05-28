@@ -28,6 +28,7 @@
 
 #include "entities/character.h"
 #include "gamemodes/DDRace.h"
+#include "gamecontroller.h"
 #include "player.h"
 #include "score.h"
 
@@ -1380,6 +1381,7 @@ void CGameContext::OnClientEnter(int ClientID)
 			m_apPlayers[ClientID]->m_ShowOthers = g_Config.m_SvShowOthersDefault;
 		}
 	}
+	SendBroadcast("Hammer others into spikes or off the platform to win!", ClientID);
 	m_VoteUpdate = true;
 
 	// send active vote
@@ -2454,33 +2456,41 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				pChr->SetEmote(EmoteType, Server()->Tick() + 2 * Server()->TickSpeed());
 			}
 		}
+		//prevent killing
 		else if(MsgID == NETMSGTYPE_CL_KILL && !m_World.m_Paused)
 		{
-			if(m_VoteCloseTime && m_VoteCreator == ClientID && GetDDRaceTeam(ClientID) && (IsKickVote() || IsSpecVote()))
-			{
-				SendChatTarget(ClientID, "You are running a vote please try again after the vote is done!");
-				return;
-			}
-			if(pPlayer->m_LastKill && pPlayer->m_LastKill + Server()->TickSpeed() * g_Config.m_SvKillDelay > Server()->Tick())
-				return;
-			if(pPlayer->IsPaused())
+			if(pPlayer->m_LastKill && pPlayer->m_LastKill+Server()->TickSpeed()*3 > Server()->Tick())
 				return;
 
-			CCharacter *pChr = pPlayer->GetCharacter();
-			if(!pChr)
-				return;
+			char aBuf[512];
+			str_format(aBuf, sizeof(aBuf), "You can't commit suicide!");
+			SendChatTarget(ClientID, aBuf);
 
-			//Kill Protection
-			int CurrTime = (Server()->Tick() - pChr->m_StartTime) / Server()->TickSpeed();
-			if(g_Config.m_SvKillProtection != 0 && CurrTime >= (60 * g_Config.m_SvKillProtection) && pChr->m_DDRaceState == DDRACE_STARTED)
-			{
-				SendChatTarget(ClientID, "Kill Protection enabled. If you really want to kill, type /kill");
-				return;
-			}
-
-			pPlayer->m_LastKill = Server()->Tick();
-			pPlayer->KillCharacter(WEAPON_SELF);
-			pPlayer->Respawn();
+//			if(m_VoteCloseTime && m_VoteCreator == ClientID && GetDDRaceTeam(ClientID) && (IsKickVote() || IsSpecVote()))
+//			{
+//				SendChatTarget(ClientID, "You are running a vote please try again after the vote is done!");
+//				return;
+//			}
+//			if(pPlayer->m_LastKill && pPlayer->m_LastKill + Server()->TickSpeed() * g_Config.m_SvKillDelay > Server()->Tick())
+//				return;
+//			if(pPlayer->IsPaused())
+//				return;
+//
+//			CCharacter *pChr = pPlayer->GetCharacter();
+//			if(!pChr)
+//				return;
+//
+//			//Kill Protection
+//			int CurrTime = (Server()->Tick() - pChr->m_StartTime) / Server()->TickSpeed();
+//			if(g_Config.m_SvKillProtection != 0 && CurrTime >= (60 * g_Config.m_SvKillProtection) && pChr->m_DDRaceState == DDRACE_STARTED)
+//			{
+//				SendChatTarget(ClientID, "Kill Protection enabled. If you really want to kill, type /kill");
+//				return;
+//			}
+//
+//			pPlayer->m_LastKill = Server()->Tick();
+//			pPlayer->KillCharacter(WEAPON_SELF);
+//			pPlayer->Respawn();
 		}
 	}
 	if(MsgID == NETMSGTYPE_CL_STARTINFO)

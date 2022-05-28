@@ -44,11 +44,15 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_EmoteStop = -1;
 	m_LastAction = -1;
 	m_LastNoAmmoSound = -1;
+//	m_ActiveWeapon = WEAPON_HAMMER;
 	m_LastWeapon = WEAPON_HAMMER;
+	m_KnockbackStrength = 0;
+	m_SuperHammer = 0;
 	m_QueuedWeapon = -1;
 	m_LastRefillJumps = false;
 	m_LastPenalty = false;
 	m_LastBonus = false;
+	m_Armor = 0;
 
 	m_TeleGunTeleport = false;
 	m_IsBlueTeleGunTeleport = false;
@@ -66,7 +70,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 	m_Core.Reset();
 	m_Core.Init(&GameServer()->m_World.m_Core, GameServer()->Collision());
-	m_Core.m_ActiveWeapon = WEAPON_GUN;
+	m_Core.m_ActiveWeapon = WEAPON_HAMMER;
 	m_Core.m_Pos = m_Pos;
 	m_Core.m_Id = m_pPlayer->GetCID();
 	GameServer()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = &m_Core;
@@ -211,7 +215,7 @@ void CCharacter::HandleNinja()
 	m_Armor = clamp(10 - (NinjaTime / 15), 0, 10);
 
 	// force ninja Weapon
-	SetWeapon(WEAPON_NINJA);
+//	SetWeapon(WEAPON_NINJA);
 
 	m_Core.m_Ninja.m_CurrentMoveTime--;
 
@@ -441,6 +445,21 @@ void CCharacter::FireWeapon()
 				Dir = vec2(0.f, -1.f);
 			/*pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
 					m_pPlayer->GetCID(), m_Core.m_ActiveWeapon);*/
+
+			float FinalHammerStrength = g_Config.m_SvHammerStartStrength/10.f + pTarget->m_KnockbackStrength * g_Config.m_SvHammerHitStrength/10.f;
+			if(m_SuperHammer > 0)
+			{
+				FinalHammerStrength += g_Config.m_SvHammerSuperStrength/10.f;
+				m_SuperHammer -= 1;
+			}
+			vec2 Force = vec2(0.f, -1.f) + normalize(vec2(Dir.x*2, Dir.y - 1.1f)) * FinalHammerStrength;
+			pTarget->TakeDamage(Force, 0, m_pPlayer->GetCID(), m_Core.m_ActiveWeapon);
+			pTarget->m_LastHammer.By(m_pPlayer->GetCID(), g_Config.m_SvScoreTimeHammer);
+			if(pTarget->m_Armor == 0)
+				pTarget->m_KnockbackStrength += 1;
+			else
+				pTarget->m_Armor -= 1;
+
 
 			float Strength;
 			if(!m_TuneZone)
@@ -730,7 +749,7 @@ void CCharacter::Tick()
 		m_EmoteStop = -1;
 	}
 
-	DDRaceTick();
+//	DDRaceTick();
 
 	Antibot()->OnCharacterTick(m_pPlayer->GetCID());
 
@@ -740,6 +759,14 @@ void CCharacter::Tick()
 	if(!m_PrevInput.m_Hook && m_Input.m_Hook && !(m_Core.m_TriggeredEvents & COREEVENT_HOOK_ATTACH_PLAYER))
 	{
 		Antibot()->OnHookAttach(m_pPlayer->GetCID(), false);
+	}
+
+	if(m_Core.m_ReleaseHook)
+	{
+		m_Core.m_HookedPlayer = -1;
+		m_Core.m_HookState = HOOK_RETRACTED;
+		m_Core.m_HookPos = m_Core.m_Pos;
+		m_Core.m_ReleaseHook = 0;
 	}
 
 	// handle Weapons
@@ -826,7 +853,14 @@ void CCharacter::TickDefered()
 			GameServer()->CreateSound(m_Pos, SOUND_PLAYER_JUMP, TeamMaskExceptSelf);
 
 		if(Events & COREEVENT_HOOK_ATTACH_PLAYER)
+		{
+//			GameServer()->CreateSound(m_Pos, SOUND_HOOK_ATTACH_PLAYER, TeamMaskExceptSelfIfSixup);
 			GameServer()->CreateSound(m_Pos, SOUND_HOOK_ATTACH_PLAYER, TeamMaskExceptSelfIfSixup);
+			int HookedCID = m_Core.m_HookedPlayer;
+			if(GameServer()->m_apPlayers[HookedCID] && GameServer()->m_apPlayers[HookedCID]->GetCharacter())
+				GameServer()->m_apPlayers[HookedCID]->GetCharacter()->m_LastHook.By(m_pPlayer->GetCID(), g_Config.m_SvScoreTimeHook);
+
+		}
 
 		if(Events & COREEVENT_HOOK_ATTACH_GROUND)
 			GameServer()->CreateSound(m_Pos, SOUND_HOOK_ATTACH_GROUND, TeamMaskExceptSelf);
@@ -893,8 +927,18 @@ bool CCharacter::IncreaseArmor(int Amount)
 
 void CCharacter::Die(int Killer, int Weapon)
 {
-	if(Server()->IsRecording(m_pPlayer->GetCID()))
-		Server()->StopRecord(m_pPlayer->GetCID());
+//	if(Server()->IsRecording(m_pPlayer->GetCID()))
+//		Server()->StopRecord(m_pPlayer->GetCID());
+	if(m_LastHammer.Who() != -1)
+	{
+		Killer = m_LastHammer.Who();
+		Weapon = WEAPON_HAMMER;
+	}
+	else if(m_LastHook.Who() != -1)
+	{
+		Killer = m_LastHook.Who();
+		// keep weapon game for hooks (not sure if there is a better weapon to represent hooking)
+	}
 
 	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, GameServer()->m_apPlayers[Killer], Weapon);
 
@@ -911,6 +955,29 @@ void CCharacter::Die(int Killer, int Weapon)
 	Msg.m_Weapon = Weapon;
 	Msg.m_ModeSpecial = ModeSpecial;
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+
+	if (g_Config.m_SvKillingSpree)
+	{
+		if(OnSpree())
+			GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
+
+		if(m_pPlayer->GetCID() != Killer && GameServer()->m_apPlayers[Killer] && GameServer()->m_apPlayers[Killer]->GetCharacter())
+			GameServer()->m_apPlayers[Killer]->GetCharacter()->SpreeAdd();
+
+		SpreeEnd(Killer);
+	}
+
+	// set killers emote to happy
+	if (Killer != m_pPlayer->GetCID() && GameServer()->m_apPlayers[Killer])
+	{
+		CCharacter *pChr = GameServer()->m_apPlayers[Killer]->GetCharacter();
+		if (pChr)
+		{
+			pChr->m_EmoteType = EMOTE_HAPPY;
+			pChr->m_EmoteStop = Server()->Tick() + Server()->TickSpeed();
+		}
+	}
+
 
 	// a nice sound
 	GameServer()->CreateSound(m_Pos, SOUND_PLAYER_DIE, TeamMask());
@@ -1128,8 +1195,13 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 
 		pCharacter->m_AttackTick = m_AttackTick;
 		pCharacter->m_Direction = m_Input.m_Direction;
-		pCharacter->m_Weapon = Weapon;
+//		pCharacter->m_Weapon = Weapon;
+		if(m_SuperHammer > 0)
+			pCharacter->m_Weapon = WEAPON_NINJA;
+		else
+			pCharacter->m_Weapon = Weapon;
 		pCharacter->m_AmmoCount = AmmoCount;
+		pCharacter->m_Health = Health;
 		pCharacter->m_Health = Health;
 		pCharacter->m_Armor = Armor;
 		pCharacter->m_PlayerFlags = GetPlayer()->m_PlayerFlags;
@@ -1150,7 +1222,11 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 		pCharacter->m_Emote = Emote;
 		pCharacter->m_AttackTick = m_AttackTick;
 		pCharacter->m_Direction = m_Input.m_Direction;
-		pCharacter->m_Weapon = Weapon;
+//		pCharacter->m_Weapon = Weapon;
+		if(m_SuperHammer > 0)
+			pCharacter->m_Weapon = WEAPON_NINJA;
+		else
+			pCharacter->m_Weapon = Weapon;
 		pCharacter->m_AmmoCount = AmmoCount;
 
 		if(m_FreezeTime > 0 || m_FreezeTime == -1 || m_DeepFreeze)
@@ -2104,7 +2180,8 @@ void CCharacter::SetRescue()
 void CCharacter::DDRaceTick()
 {
 	mem_copy(&m_Input, &m_SavedInput, sizeof(m_Input));
-	m_Armor = (m_FreezeTime >= 0) ? 10 - (m_FreezeTime / 15) : 0;
+//	m_Armor = (m_FreezeTime >= 0) ? 10 - (m_FreezeTime / 15) : 0;
+	m_Armor = (m_FreezeTime >= 0) ? 0 - (m_FreezeTime / 15) : 0;
 	if(m_Input.m_Direction != 0 || m_Input.m_Jump != 0)
 		m_LastMove = Server()->Tick();
 
@@ -2429,4 +2506,80 @@ int64_t CCharacter::TeamMask()
 void CCharacter::SwapClients(int Client1, int Client2)
 {
 	m_Core.SetHookedPlayer(m_Core.m_HookedPlayer == Client1 ? Client2 : m_Core.m_HookedPlayer == Client2 ? Client1 : m_Core.m_HookedPlayer);
+}
+
+bool CCharacter::OnSpree()
+{
+	if(m_Spree >= g_Config.m_SvKillingSpreeMsgKills)
+		return true;
+	return false;
+}
+
+const char *CCharacter::SpreeMessage()
+{
+	static char SpreeMsg[][32] = {
+		"a SMASHed SMASHer",
+		"on a SMASHing spree",
+		"unSMASHable",
+		"SMASHing here",
+		"in a SMASHed mood",
+		"SMASHmazing",
+		"a supercute SMASHer",
+		"born to be a SMASHer",
+		"SMASHing it like a boss",
+		"addicted to SMASH",
+		"like a SMASH god",
+		"a SMASHing legend",
+		"using a SMASH-bot",
+		"should be SMASH developer"
+	};
+	static int SpreeMsgNum = sizeof(SpreeMsg) / sizeof(SpreeMsg[0]);
+	int i = m_Spree / g_Config.m_SvKillingSpreeMsgKills - 1;
+	if(i >= SpreeMsgNum)
+		i = SpreeMsgNum - 1;
+	return SpreeMsg[i];
+}
+
+void CCharacter::SpreeAdd()
+{
+	m_Spree++;
+	if(m_Spree % g_Config.m_SvKillingSpreeMsgKills == 0)
+	{
+		char aBuf[512];
+		str_format(aBuf, sizeof(aBuf), "'%s' is %s with %d kills!", Server()->ClientName(m_pPlayer->GetCID()), SpreeMessage(), m_Spree);
+		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+	}
+}
+
+void CCharacter::SpreeEnd(int killer)
+{
+	if(m_Spree >= g_Config.m_SvKillingSpreeMsgKills)
+	{
+		char aBuf[512];
+		if(killer == m_pPlayer->GetCID())
+			str_format(aBuf, sizeof(aBuf), "'%s' was %s with %d kills but died", Server()->ClientName(m_pPlayer->GetCID()), SpreeMessage(), m_Spree);
+		else
+			str_format(aBuf, sizeof(aBuf), "'%s' was %s with %d kills but was stopped by '%s'", Server()->ClientName(m_pPlayer->GetCID()), SpreeMessage(), m_Spree, Server()->ClientName(killer));
+		GameServer()->SendChat(-1, CGameContext::CHAT_ALL, aBuf);
+	}
+	m_Spree = 0;
+}
+
+CCharacter::LastTouch::LastTouch()
+{
+	m_TouchedBy = -1;
+	m_TouchedUntil = 0;
+}
+
+void CCharacter::LastTouch::By(int ClientID, int Duration)
+{
+	m_TouchedBy = ClientID;
+	m_TouchedUntil = time_get() + time_freq()*Duration;
+}
+
+int CCharacter::LastTouch::Who()
+{
+	if(time_get() < m_TouchedUntil)
+		return m_TouchedBy;
+	return -1;
 }

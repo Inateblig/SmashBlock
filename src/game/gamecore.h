@@ -215,6 +215,9 @@ public:
 	vec2 m_Vel;
 	bool m_Hook;
 	bool m_Collision;
+	bool m_Dash;
+	int m_DashTick;
+	int m_ReleaseHook;
 
 	vec2 m_HookPos;
 	vec2 m_HookDir;

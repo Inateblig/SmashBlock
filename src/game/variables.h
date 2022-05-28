@@ -199,6 +199,24 @@ MACRO_CONFIG_INT(ClVideoShowDirection, cl_video_show_direction, 0, 0, 2, CFGFLAG
 MACRO_CONFIG_INT(ClVideoX264Crf, cl_video_crf, 18, 0, 51, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Set crf when encode video with libx264 (0 for highest quality, 51 for lowest)")
 MACRO_CONFIG_INT(ClVideoX264Preset, cl_video_preset, 5, 0, 9, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Set preset when encode video with libx264, default is 5 (medium), 0 is ultrafast, 9 is placebo (the slowest, not recommend)")
 
+MACRO_CONFIG_INT(SvHammerStartStrength, sv_hammer_start_strength, 300, 0, 100000, CFGFLAG_SERVER, "The hammer strength before being hit")
+MACRO_CONFIG_INT(SvHammerHitStrength, sv_hammer_hit_strength, 60, 0, 100000, CFGFLAG_SERVER, "How much the hammer strength increases which each hit")
+
+MACRO_CONFIG_INT(SvScoreTimeHammer, sv_score_time_hammer, 10, 0, 1000, CFGFLAG_SERVER, "For how many seconds after hammering a player you score for his death")
+MACRO_CONFIG_INT(SvScoreTimeHook, sv_score_time_hook, 10, 0, 1000, CFGFLAG_SERVER, "For how many seconds after hooking a player you score for his death")
+
+MACRO_CONFIG_INT(SvHammerSuper, sv_hammer_super, 1, 0, 1, CFGFLAG_SERVER, "Wether the super hammer powerup (ninja) spawns")
+MACRO_CONFIG_INT(SvHammerSuperSpawnTime, sv_hammer_super_spawn_time, 90, 0, 1000, CFGFLAG_SERVER, "How many seconds it takes for the super hammer powerup (ninja) to spawn")
+MACRO_CONFIG_INT(SvHammerSuperStrength, sv_hammer_super_strength, 500, 0, 100000, CFGFLAG_SERVER, "By how much having super hammer increases the hammer strength")
+MACRO_CONFIG_INT(SvHammerSuperNumber, sv_hammer_super_number, 5, 0, 1000, CFGFLAG_SERVER, "How many hits the super hammer lasts (displayed as health ingame)")
+
+MACRO_CONFIG_INT(SvKillingSpree, sv_killing_spree, 1, 0, 1, CFGFLAG_SERVER, "Enable killing spree messages")
+MACRO_CONFIG_INT(SvKillingSpreeMsgKills, sv_killing_spree_msg_kills, 3, 1, 1000, CFGFLAG_SERVER, "How many kills to do between killing spree messages")
+
+MACRO_CONFIG_INT(SvDashImpulse, sv_dash_impulse, 20, 1, 1000, CFGFLAG_SERVER, "the dash impulse")
+MACRO_CONFIG_INT(SvDashDelay, sv_dash_delay, 5000, 1, 100000, CFGFLAG_SERVER, "the dash delay")
+
+
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, 15, CFGFLAG_SERVER, "(Debug build only)")

@@ -1578,3 +1578,15 @@ void CGameContext::ConTopPoints(IConsole::IResult *pResult, void *pUserData)
 	else
 		pSelf->Score()->ShowTopPoints(pResult->m_ClientID);
 }
+
+void CGameContext::ConDash(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	if(!CheckClientID(pResult->m_ClientID))
+		return;
+	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
+	if(!pPlayer)
+		return;
+	pPlayer->GetCharacter()->Core()->m_Dash = 1;
+
+}

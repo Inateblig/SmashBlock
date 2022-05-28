@@ -82,6 +82,8 @@ public:
 
 	int NeededFaketuning() { return m_NeededFaketuning; }
 	bool IsAlive() const { return m_Alive; }
+	int m_KnockbackStrength;
+	int m_SuperHammer;
 	bool IsPaused() const { return m_Paused; }
 	class CPlayer *GetPlayer() { return m_pPlayer; }
 	int64_t TeamMask();
@@ -141,6 +143,27 @@ private:
 	int m_ReckoningTick; // tick that we are performing dead reckoning From
 	CCharacterCore m_SendCore; // core that we should send
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
+
+	// record who hammered or hooked us last
+	class LastTouch
+	{
+		int m_TouchedBy;
+		int64_t m_TouchedUntil;
+	public:
+		LastTouch();
+		void By(int ClientID, int Duration);
+		int Who();
+	};
+	LastTouch m_LastHammer;
+	LastTouch m_LastHook;
+
+	// spree messages
+	int m_Spree;
+	void SpreeAdd();
+	void SpreeEnd(int Killer);
+	bool OnSpree();
+	const char *SpreeMessage();
+
 
 	// DDRace
 
