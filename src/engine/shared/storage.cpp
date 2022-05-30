@@ -288,7 +288,7 @@ public:
 				else
 				{
 #if defined(CONF_PLATFORM_MACOS)
-					str_append(m_aBinarydir, "/../../../DDNet-Server.app/Contents/MacOS", sizeof(m_aBinarydir));
+					str_append(m_aBinarydir, "/../../../SmashBlock-Server.app/Contents/MacOS", sizeof(m_aBinarydir));
 					str_format(aBuf, sizeof(aBuf), "%s/" PLAT_SERVER_EXEC, m_aBinarydir);
 					IOHANDLE FileBis = io_open(aBuf, IOFLAG_READ);
 					if(FileBis)

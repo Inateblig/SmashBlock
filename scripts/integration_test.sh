@@ -47,9 +47,9 @@ then
 	echo "Error: client binary not found '$arg_build_dir/DDNet' not found"
 	exit 1
 fi
-if [ ! -f "$arg_build_dir"/DDNet-Server ]
+if [ ! -f "$arg_build_dir"/SmashBlock-Server ]
 then
-	echo "Error: server binary not found '$arg_build_dir/DDNet-Server' not found"
+	echo "Error: server binary not found '$arg_build_dir/SmashBlock-Server' not found"
 	exit 1
 fi
 
