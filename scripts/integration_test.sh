@@ -54,7 +54,7 @@ then
 fi
 
 mkdir -p integration_test
-cp "$arg_build_dir"/DDNet* integration_test
+cp "$arg_build_dir"/DDNet "$arg_build_dir"/SmashBlock-Server integration_test
 
 cd integration_test || exit 1
 
