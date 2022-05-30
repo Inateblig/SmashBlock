@@ -2509,9 +2509,7 @@ void CCharacter::SwapClients(int Client1, int Client2)
 
 bool CCharacter::OnSpree()
 {
-	if(m_Spree >= g_Config.m_SvKillingSpreeMsgKills)
-		return true;
-	return false;
+	return m_Spree >= g_Config.m_SvKillingSpreeMsgKills;
 }
 
 const char *CCharacter::SpreeMessage()

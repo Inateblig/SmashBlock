@@ -782,18 +782,15 @@ void IGameController::DoWincheck()
 			// gather some stats
 			int Topscore = 0;
 			int TopscoreCount = 0;
-			for(int i = 0; i < MAX_CLIENTS; i++)
+			for(auto & m_apPlayer : GameServer()->m_apPlayers)
 			{
-				if(GameServer()->m_apPlayers[i])
+				if(m_apPlayer->m_Score > Topscore)
 				{
-					if(GameServer()->m_apPlayers[i]->m_Score > Topscore)
-					{
-						Topscore = GameServer()->m_apPlayers[i]->m_Score;
-						TopscoreCount = 1;
-					}
-					else if(GameServer()->m_apPlayers[i]->m_Score == Topscore)
-						TopscoreCount++;
+					Topscore = m_apPlayer->m_Score;
+					TopscoreCount = 1;
 				}
+				else if(m_apPlayer->m_Score == Topscore)
+					TopscoreCount++;
 			}
 
 			// check score win condition
