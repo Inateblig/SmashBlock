@@ -115,7 +115,7 @@ void CPlayer::Reset()
 	m_DND = false;
 
 	m_LastPause = 0;
-	m_Score = -9999;
+	m_Score = 0;
 	m_HasFinishScore = false;
 
 	// Variable initialized:
@@ -353,11 +353,12 @@ void CPlayer::Snap(int SnappingClient)
 
 	int SnappingClientVersion = SnappingClient != SERVER_DEMO_CLIENT ? GameServer()->GetClientVersion(SnappingClient) : CLIENT_VERSIONNR;
 	int Latency = SnappingClient == SERVER_DEMO_CLIENT ? m_Latency.m_Min : GameServer()->m_apPlayers[SnappingClient]->m_aCurLatency[m_ClientID];
-	int Score = abs(m_Score) * -1;
+//	int Score = abs(m_Score) * -1;
+	int Score = m_Score;
 
 	// send 0 if times of others are not shown
 	if(SnappingClient != m_ClientID && g_Config.m_SvHideScore)
-		Score = -9999;
+		Score = 0;
 
 	if(!Server()->IsSixup(SnappingClient))
 	{
@@ -488,7 +489,7 @@ void CPlayer::FakeSnap()
 	pPlayerInfo->m_Latency = m_Latency.m_Min;
 	pPlayerInfo->m_Local = 1;
 	pPlayerInfo->m_ClientID = FakeID;
-	pPlayerInfo->m_Score = -9999;
+	pPlayerInfo->m_Score = 0;
 	pPlayerInfo->m_Team = TEAM_SPECTATORS;
 
 	CNetObj_SpectatorInfo *pSpectatorInfo = static_cast<CNetObj_SpectatorInfo *>(Server()->SnapNewItem(NETOBJTYPE_SPECTATORINFO, FakeID, sizeof(CNetObj_SpectatorInfo)));
@@ -958,7 +959,7 @@ void CPlayer::ProcessScoreResult(CScorePlayerResult &Result)
 			// -9999 stands for no time and isn't displayed in scoreboard, so
 			// shift the time by a second if the player actually took 9999
 			// seconds to finish the map.
-			if(m_HasFinishScore && m_Score == -9999)
+			if(m_HasFinishScore && m_Score == 0)
 				m_Score = -10000;
 			Server()->ExpireServerInfo();
 			int Birthday = Result.m_Data.m_Info.m_Birthday;

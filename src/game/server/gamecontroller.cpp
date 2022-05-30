@@ -468,6 +468,9 @@ void IGameController::StartRound()
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "start round type='%s' teamplay='%d'", m_pGameType, m_GameFlags & GAMEFLAG_TEAMS);
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+	for(auto &pPlayer : GameServer()->m_apPlayers)
+		if(pPlayer)
+			pPlayer->m_Score = 0;
 }
 
 void IGameController::ChangeMap(const char *pToMap)
@@ -484,8 +487,17 @@ void IGameController::OnReset()
 
 int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon)
 {
+	// do scoreing
+	if(!pKiller || Weapon == WEAPON_GAME)
+		return 0;
+	if(pKiller == pVictim->GetPlayer())
+		pVictim->GetPlayer()->m_Score--; // suicide
+	else
+		pKiller->m_Score++; // normal kill
+
 	return 0;
 }
+
 
 void IGameController::OnCharacterSpawn(class CCharacter *pChr)
 {
@@ -541,6 +553,7 @@ void IGameController::Tick()
 	}
 
 	DoActivityCheck();
+	DoWincheck();
 }
 
 void IGameController::Snap(int SnappingClient)
@@ -760,4 +773,39 @@ void IGameController::DoTeamChange(CPlayer *pPlayer, int Team, bool DoChatMsg)
 	GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 
 	// OnPlayerInfoChange(pPlayer);
+}
+
+void IGameController::DoWincheck()
+{
+	if(m_GameOverTick == -1 && !m_Warmup && !GameServer()->m_World.m_ResetRequested)
+	{
+		{
+			// gather some stats
+			int Topscore = 0;
+			int TopscoreCount = 0;
+			for(int i = 0; i < MAX_CLIENTS; i++)
+			{
+				if(GameServer()->m_apPlayers[i])
+				{
+					if(GameServer()->m_apPlayers[i]->m_Score > Topscore)
+					{
+						Topscore = GameServer()->m_apPlayers[i]->m_Score;
+						TopscoreCount = 1;
+					}
+					else if(GameServer()->m_apPlayers[i]->m_Score == Topscore)
+						TopscoreCount++;
+				}
+			}
+
+			// check score win condition
+			if((g_Config.m_SvScorelimit > 0 && Topscore >= g_Config.m_SvScorelimit) ||
+				(g_Config.m_SvTimelimit > 0 && (Server()->Tick()-m_RoundStartTick) >= g_Config.m_SvTimelimit*Server()->TickSpeed()*60))
+			{
+				if(TopscoreCount == 1)
+					EndRound();
+				else
+					m_SuddenDeath = 1;
+			}
+		}
+	}
 }

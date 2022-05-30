@@ -937,7 +937,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	else if(m_LastHook.Who() != -1)
 	{
 		Killer = m_LastHook.Who();
-		// keep weapon game for hooks (not sure if there is a better weapon to represent hooking)
+		Weapon = WEAPON_HAMMER; //set hammer as weapon even if killed by hook
 	}
 
 	int ModeSpecial = GameServer()->m_pController->OnCharacterDeath(this, GameServer()->m_apPlayers[Killer], Weapon);

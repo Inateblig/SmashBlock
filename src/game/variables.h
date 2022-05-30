@@ -216,6 +216,8 @@ MACRO_CONFIG_INT(SvKillingSpreeMsgKills, sv_killing_spree_msg_kills, 3, 1, 1000,
 MACRO_CONFIG_INT(SvDashImpulse, sv_dash_impulse, 20, 1, 1000, CFGFLAG_SERVER, "the dash impulse")
 MACRO_CONFIG_INT(SvDashDelay, sv_dash_delay, 5000, 1, 100000, CFGFLAG_SERVER, "the dash delay")
 
+MACRO_CONFIG_INT(SvScorelimit, sv_scorelimit, 20, 0, 1000, CFGFLAG_SERVER, "Score limit (0 disables)")
+MACRO_CONFIG_INT(SvTimelimit, sv_timelimit, 0, 0, 1000, CFGFLAG_SERVER, "Time limit in minutes (0 disables)")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
