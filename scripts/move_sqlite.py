@@ -5,7 +5,7 @@
 # may be redirected to email notifying about manual action to transfer the
 # ranks to MySQL.
 #
-# Configure cron as the user running the DDNet-Server processes
+# Configure cron as the user running the SmashBlock-Server processes
 #
 #     $ crontab -e
 #     30 5 * * * /path/to/this/script/move_sqlite.py --from /path/to/ddnet-server.sqlite

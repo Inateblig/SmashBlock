@@ -265,7 +265,7 @@ $ mkdir build
 $ cd build
 $ cmake -DMYSQL=ON ..
 $ make -j8
-$ ./DDNet-Server -f mine.cfg
+$ ./SmashBlock-Server -f mine.cfg
 ```
 
 <a href="https://repology.org/metapackage/ddnet/versions">

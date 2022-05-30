@@ -1,4 +1,4 @@
-= DDNet-Server(6)
+= SmashBlock-Server(6)
 DDNet Contributors
 v1.0.0
 // User defined variables
@@ -12,21 +12,21 @@ v1.0.0
 :man-linkstyle: pass:[blue R < >]
 
 == NAME
-DDNet-Server - Starts the DDNet server.
+SmashBlock-Server - Starts the DDNet server.
 
 == SYNOPSIS
-*DDNet-Server* [_OPTION_]... [-f _CONFIG_FILE_]...
+*SmashBlock-Server* [_OPTION_]... [-f _CONFIG_FILE_]...
 
 == DESCRIPTION
 DDraceNetwork (DDNet) is an actively maintained version of *DDRace*,
 a *Teeworlds* modification with a unique cooperative gameplay.
 
 == EXAMPLES
-*DDNet-Server* -f myfile.cfg
+*SmashBlock-Server* -f myfile.cfg
 
-*DDNet-Server* -f myfile.cfg -f myfile2.cfg
+*SmashBlock-Server* -f myfile.cfg -f myfile2.cfg
 
-*DDNet-Server* \'sv_register 0' \'sv_name "Nameless Server"'
+*SmashBlock-Server* \'sv_register 0' \'sv_name "Nameless Server"'
 
 == Options
 

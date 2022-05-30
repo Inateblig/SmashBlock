@@ -139,7 +139,7 @@ function print_san() {
 }
 
 
-./DDNet-Server \
+./SmashBlock-Server \
 	"sv_input_fifo server.fifo;
 	sv_map coverage;
 	sv_sqlite_file ddnet-server.sqlite;
