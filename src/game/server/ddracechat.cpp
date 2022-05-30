@@ -1587,5 +1587,5 @@ void CGameContext::ConDash(IConsole::IResult *pResult, void *pUserData)
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
 	if(!pPlayer)
 		return;
-	pPlayer->GetCharacter()->Core()->m_Dash = 1;
+	pPlayer->GetCharacter()->Core()->m_Dash = true;
 }
