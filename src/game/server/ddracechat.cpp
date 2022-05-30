@@ -1588,5 +1588,4 @@ void CGameContext::ConDash(IConsole::IResult *pResult, void *pUserData)
 	if(!pPlayer)
 		return;
 	pPlayer->GetCharacter()->Core()->m_Dash = 1;
-
 }

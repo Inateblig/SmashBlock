@@ -30,12 +30,11 @@ CPickup::CPickup(CGameWorld *pGameWorld, int Type, int SubType, int Layer, int N
 
 void CPickup::Reset()
 {
-	if (g_pData->m_aPickups[m_Type].m_Spawndelay > 0)
+	if(g_pData->m_aPickups[m_Type].m_Spawndelay > 0)
 		m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * g_pData->m_aPickups[m_Type].m_Spawndelay;
 	else
 		m_SpawnTick = -1;
 }
-
 
 void CPickup::Tick()
 {
@@ -59,59 +58,59 @@ void CPickup::Tick()
 	{
 		// player picked us up, is someone was hooking us, let them go
 		int RespawnTime = -1;
-		switch (m_Type)
+		switch(m_Type)
 		{
-			case POWERUP_HEALTH:
-				if(pChr->m_KnockbackStrength >= 1)
-				{
-					pChr->m_KnockbackStrength -= 1;
-					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
-					RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
-				}
-				/*if(pChr->IncreaseHealth(1))
+		case POWERUP_HEALTH:
+			if(pChr->m_KnockbackStrength >= 1)
+			{
+				pChr->m_KnockbackStrength -= 1;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
+				RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
+			}
+			/*if(pChr->IncreaseHealth(1))
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
 					RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
 				}*/
-				break;
+			break;
 
-			case POWERUP_ARMOR:
-				if(pChr->IncreaseArmor(1))
-				{
-					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
-					RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
-				}
-				break;
+		case POWERUP_ARMOR:
+			if(pChr->IncreaseArmor(1))
+			{
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
+				RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
+			}
+			break;
 
-//			case POWERUP_WEAPON:
-//				if(m_Subtype >= 0 && m_Subtype < NUM_WEAPONS)
-//				{
-//					if(pChr->GiveWeapon(m_Subtype, 10))
-//					{
-//						RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
-//
-//						if(m_Subtype == WEAPON_GRENADE)
-//							GameServer()->CreateSound(m_Pos, SOUND_PICKUP_GRENADE);
-//						else if(m_Subtype == WEAPON_SHOTGUN)
-//							GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
-//						else if(m_Subtype == WEAPON_RIFLE)
-//							GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
-//
-//						if(pChr->GetPlayer())
-//							GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), m_Subtype);
-//					}
-//				}
-//				break;
+			//			case POWERUP_WEAPON:
+			//				if(m_Subtype >= 0 && m_Subtype < NUM_WEAPONS)
+			//				{
+			//					if(pChr->GiveWeapon(m_Subtype, 10))
+			//					{
+			//						RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
+			//
+			//						if(m_Subtype == WEAPON_GRENADE)
+			//							GameServer()->CreateSound(m_Pos, SOUND_PICKUP_GRENADE);
+			//						else if(m_Subtype == WEAPON_SHOTGUN)
+			//							GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
+			//						else if(m_Subtype == WEAPON_RIFLE)
+			//							GameServer()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
+			//
+			//						if(pChr->GetPlayer())
+			//							GameServer()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), m_Subtype);
+			//					}
+			//				}
+			//				break;
 
-			case POWERUP_NINJA:
-				{
-					if(pChr->m_SuperHammer == 0)
-					{
-						pChr->m_SuperHammer = g_Config.m_SvHammerSuperNumber;
-						RespawnTime = g_Config.m_SvHammerSuperSpawnTime;
-					}
-					// loop through all players, setting their emotes
-					/*CCharacter *pC = static_cast<CCharacter *>(GameServer()->m_World.FindFirst(CGameWorld::ENTTYPE_CHARACTER));
+		case POWERUP_NINJA:
+		{
+			if(pChr->m_SuperHammer == 0)
+			{
+				pChr->m_SuperHammer = g_Config.m_SvHammerSuperNumber;
+				RespawnTime = g_Config.m_SvHammerSuperSpawnTime;
+			}
+			// loop through all players, setting their emotes
+			/*CCharacter *pC = static_cast<CCharacter *>(GameServer()->m_World.FindFirst(CGameWorld::ENTTYPE_CHARACTER));
 					for(; pC; pC = (CCharacter *)pC->TypeNext())
 					{
 						if (pC != pChr)
@@ -119,11 +118,11 @@ void CPickup::Tick()
 					}
 
 					pChr->SetEmote(EMOTE_ANGRY, Server()->Tick() + 1200 * Server()->TickSpeed() / 1000);*/
-					break;
-				}
+			break;
+		}
 
-			default:
-				break;
+		default:
+			break;
 		};
 
 		if(RespawnTime >= 0)
@@ -137,23 +136,20 @@ void CPickup::Tick()
 	}
 }
 
-
 void CPickup::TickPaused()
 {
 	if(m_SpawnTick != -1)
 		++m_SpawnTick;
 }
 
-
 void CPickup::Snap(int SnappingClient)
 {
 	if(m_SpawnTick != -1 || NetworkClipped(SnappingClient))
 		return;
 
-
 	int Size = Server()->IsSixup(SnappingClient) ? 3 * 4 : sizeof(CNetObj_Pickup);
 	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), Size));
-//	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
+	//	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
 	if(!pP)
 		return;
 
@@ -162,7 +158,6 @@ void CPickup::Snap(int SnappingClient)
 	pP->m_Type = m_Type;
 	pP->m_Subtype = m_Subtype;
 }
-
 
 void CPickup::Move()
 {

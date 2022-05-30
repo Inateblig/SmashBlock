@@ -23,7 +23,7 @@ IGameController::IGameController(class CGameContext *pGameServer)
 	m_pGameServer = pGameServer;
 	m_pConfig = m_pGameServer->Config();
 	m_pServer = m_pGameServer->Server();
-//	m_pGameType = "unknown";
+	//	m_pGameType = "unknown";
 	m_pGameType = "SmashBlock";
 
 	//
@@ -278,33 +278,33 @@ bool IGameController::OnEntity(int Index, vec2 Pos, int Layer, int Flags, int Nu
 
 	if(Index == ENTITY_ARMOR_1)
 		Type = POWERUP_ARMOR;
-//	else if(Index == ENTITY_ARMOR_SHOTGUN)
-//		Type = POWERUP_ARMOR_SHOTGUN;
-//	else if(Index == ENTITY_ARMOR_GRENADE)
-//		Type = POWERUP_ARMOR_GRENADE;
-//	else if(Index == ENTITY_ARMOR_NINJA)
-//		Type = POWERUP_ARMOR_NINJA;
-//	else if(Index == ENTITY_ARMOR_LASER)
-//		Type = POWERUP_ARMOR_LASER;
+	//	else if(Index == ENTITY_ARMOR_SHOTGUN)
+	//		Type = POWERUP_ARMOR_SHOTGUN;
+	//	else if(Index == ENTITY_ARMOR_GRENADE)
+	//		Type = POWERUP_ARMOR_GRENADE;
+	//	else if(Index == ENTITY_ARMOR_NINJA)
+	//		Type = POWERUP_ARMOR_NINJA;
+	//	else if(Index == ENTITY_ARMOR_LASER)
+	//		Type = POWERUP_ARMOR_LASER;
 	else if(Index == ENTITY_HEALTH_1)
 		Type = POWERUP_HEALTH;
-//	else if(Index == ENTITY_WEAPON_SHOTGUN)
-//	{
-//		Type = POWERUP_WEAPON;
-//		SubType = WEAPON_SHOTGUN;
-//	}
-//	else if(Index == ENTITY_WEAPON_GRENADE)
-//	{
-//		Type = POWERUP_WEAPON;
-//		SubType = WEAPON_GRENADE;
-//	}
-//	else if(Index == ENTITY_WEAPON_LASER)
-//	{
-//		Type = POWERUP_WEAPON;
-//		SubType = WEAPON_LASER;
-//	}
+	//	else if(Index == ENTITY_WEAPON_SHOTGUN)
+	//	{
+	//		Type = POWERUP_WEAPON;
+	//		SubType = WEAPON_SHOTGUN;
+	//	}
+	//	else if(Index == ENTITY_WEAPON_GRENADE)
+	//	{
+	//		Type = POWERUP_WEAPON;
+	//		SubType = WEAPON_GRENADE;
+	//	}
+	//	else if(Index == ENTITY_WEAPON_LASER)
+	//	{
+	//		Type = POWERUP_WEAPON;
+	//		SubType = WEAPON_LASER;
+	//	}
 	else if(Index == ENTITY_POWERUP_NINJA && g_Config.m_SvHammerSuper)
-//	else if(Index == ENTITY_POWERUP_NINJA)
+	//	else if(Index == ENTITY_POWERUP_NINJA)
 	{
 		Type = POWERUP_NINJA;
 		SubType = WEAPON_NINJA;
@@ -498,7 +498,6 @@ int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *
 	return 0;
 }
 
-
 void IGameController::OnCharacterSpawn(class CCharacter *pChr)
 {
 	// default health
@@ -506,7 +505,7 @@ void IGameController::OnCharacterSpawn(class CCharacter *pChr)
 
 	// give default weapons
 	pChr->GiveWeapon(WEAPON_HAMMER);
-//	pChr->GiveWeapon(WEAPON_GUN);
+	//	pChr->GiveWeapon(WEAPON_GUN);
 }
 
 void IGameController::HandleCharacterTiles(CCharacter *pChr, int MapIndex)
@@ -799,7 +798,7 @@ void IGameController::DoWincheck()
 
 			// check score win condition
 			if((g_Config.m_SvScorelimit > 0 && Topscore >= g_Config.m_SvScorelimit) ||
-				(g_Config.m_SvTimelimit > 0 && (Server()->Tick()-m_RoundStartTick) >= g_Config.m_SvTimelimit*Server()->TickSpeed()*60))
+				(g_Config.m_SvTimelimit > 0 && (Server()->Tick() - m_RoundStartTick) >= g_Config.m_SvTimelimit * Server()->TickSpeed() * 60))
 			{
 				if(TopscoreCount == 1)
 					EndRound();
