@@ -43,6 +43,7 @@ jobs:
           cat ./SAN.*
           exit 1
         fi
+    # deactivate, don't know what happen :-(
     #- name: Run integration tests with ASan and UBSan
     #  run: |
     #    bash -x ./scripts/integration_test.sh san
