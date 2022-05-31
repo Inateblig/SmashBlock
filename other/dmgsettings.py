@@ -29,7 +29,7 @@ else:
 # .. Useful stuff ..............................................................
 
 application_client = defines.get('client', 'DDNet.app')
-application_server = defines.get('server', 'DDNet-Server.app')
+application_server = defines.get('server', 'SmashBlock-Server.app')
 appname_client = os.path.basename(application_client)
 appname_server = os.path.basename(application_server)
 

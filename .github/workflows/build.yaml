@@ -117,7 +117,7 @@ jobs:
       env: ${{ matrix.env }}
       run: |
         cd debug
-        ./DDNet-Server shutdown
+        ./SmashBlock-Server shutdown
 
     - name: Build in release mode
       env: ${{ matrix.env }}
@@ -135,7 +135,7 @@ jobs:
       env: ${{ matrix.env }}
       run: |
         cd release
-        ./DDNet-Server shutdown
+        ./SmashBlock-Server shutdown
 
     - name: Build headless client
       env: ${{ matrix.env }}
@@ -148,7 +148,7 @@ jobs:
     - name: Test headless client
       run: |
         cd headless
-        ./DDNet-Server &
+        ./SmashBlock-Server &
         ./DDNet "cl_download_skins 0;connect localhost:8303;quit"
 
     - name: Build in release mode with debug info and all features on
@@ -170,7 +170,7 @@ jobs:
       env: ${{ matrix.env }}
       run: |
         cd fancy
-        ./DDNet-Server shutdown
+        ./SmashBlock-Server shutdown
 
     - name: Package
       run: |

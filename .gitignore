@@ -45,8 +45,8 @@ vulkan_shaders_sha256.txt
 # systems).
 DDNet
 !DDNet/
-DDNet-Server
-DDNet-Server-Launcher
+SmashBlock-Server
+SmashBlock-Server-Launcher
 libsteam_api.a
 config_retrieve
 config_store

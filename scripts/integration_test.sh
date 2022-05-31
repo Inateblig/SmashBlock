@@ -47,14 +47,14 @@ then
 	echo "Error: client binary not found '$arg_build_dir/DDNet' not found"
 	exit 1
 fi
-if [ ! -f "$arg_build_dir"/DDNet-Server ]
+if [ ! -f "$arg_build_dir"/SmashBlock-Server ]
 then
-	echo "Error: server binary not found '$arg_build_dir/DDNet-Server' not found"
+	echo "Error: server binary not found '$arg_build_dir/SmashBlock-Server' not found"
 	exit 1
 fi
 
 mkdir -p integration_test
-cp "$arg_build_dir"/DDNet* integration_test
+cp "$arg_build_dir"/DDNet "$arg_build_dir"/SmashBlock-Server integration_test
 
 cd integration_test || exit 1
 
@@ -139,7 +139,7 @@ function print_san() {
 }
 
 
-./DDNet-Server \
+./SmashBlock-Server \
 	"sv_input_fifo server.fifo;
 	sv_map coverage;
 	sv_sqlite_file ddnet-server.sqlite;

@@ -149,6 +149,7 @@ private:
 	{
 		int m_TouchedBy;
 		int64_t m_TouchedUntil;
+
 	public:
 		LastTouch();
 		void By(int ClientID, int Duration);
@@ -163,7 +164,6 @@ private:
 	void SpreeEnd(int Killer);
 	bool OnSpree();
 	const char *SpreeMessage();
-
 
 	// DDRace
 

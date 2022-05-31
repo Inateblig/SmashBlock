@@ -89,7 +89,7 @@ void CCharacterCore::Reset()
 	m_Hook = true;
 	m_Collision = true;
 	m_ReleaseHook = 0;
-	m_Dash = 0;
+	m_Dash = false;
 	m_DashTick = -1;
 
 	// DDNet Character
@@ -158,17 +158,18 @@ void CCharacterCore::Tick(bool UseInput)
 		//do dash
 		if(m_Dash && m_DashTick < 0)
 		{
-			m_Vel = vec2(cos(TmpAngle),sin(TmpAngle)) * g_Config.m_SvDashImpulse;
-			m_Dash = 0;
+			m_Vel = vec2(cos(TmpAngle), sin(TmpAngle)) * g_Config.m_SvDashImpulse;
+			m_Dash = false;
 			m_DashTick = 0;
-		} else if(m_DashTick >= 0) {
+		}
+		else if(m_DashTick >= 0)
+		{
 			m_DashTick++;
 			if(m_DashTick > g_Config.m_SvDashDelay / 1000.f * SERVER_TICK_SPEED)
 			{
 				m_DashTick = -1;
 			}
 		}
-
 
 		// Special jump cases:
 		// m_Jumps == -1: A tee may only make one ground jump. Second jumped bit is always set
