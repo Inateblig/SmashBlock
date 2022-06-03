@@ -552,7 +552,7 @@ void IGameController::Tick()
 	}
 
 	DoActivityCheck();
-	DoWincheck();
+	DoWinCheck();
 }
 
 void IGameController::Snap(int SnappingClient)
@@ -601,7 +601,7 @@ void IGameController::Snap(int SnappingClient)
 		return;
 
 	pGameInfoEx->m_Flags =
-		GAMEINFOFLAG_TIMESCORE |
+//		GAMEINFOFLAG_TIMESCORE |
 		GAMEINFOFLAG_GAMETYPE_RACE |
 		GAMEINFOFLAG_GAMETYPE_DDRACE |
 		GAMEINFOFLAG_GAMETYPE_DDNET |
@@ -774,7 +774,7 @@ void IGameController::DoTeamChange(CPlayer *pPlayer, int Team, bool DoChatMsg)
 	// OnPlayerInfoChange(pPlayer);
 }
 
-void IGameController::DoWincheck()
+void IGameController::DoWinCheck()
 {
 	if(m_GameOverTick == -1 && !m_Warmup && !GameServer()->m_World.m_ResetRequested)
 	{
@@ -784,6 +784,8 @@ void IGameController::DoWincheck()
 			int TopscoreCount = 0;
 			for(auto &m_apPlayer : GameServer()->m_apPlayers)
 			{
+				if(!m_apPlayer)
+					continue;
 				if(m_apPlayer->m_Score > Topscore)
 				{
 					Topscore = m_apPlayer->m_Score;
